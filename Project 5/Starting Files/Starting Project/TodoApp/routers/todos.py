@@ -1,4 +1,5 @@
 import sys
+
 sys.path.append("..")
 
 from typing import Optional
@@ -11,9 +12,7 @@ from .auth import get_current_user, get_user_exception
 
 
 router = APIRouter(
-    prefix="/todos",
-    tags=["todos"],
-    responses={404: {"description": "Not found"}}
+    prefix="/todos", tags=["todos"], responses={404: {"description": "Not found"}}
 )
 
 models.Base.metadata.create_all(bind=engine)
@@ -40,34 +39,35 @@ async def read_all(db: Session = Depends(get_db)):
 
 
 @router.get("/user")
-async def read_all_by_user(user: dict = Depends(get_current_user),
-                           db: Session = Depends(get_db)):
+async def read_all_by_user(
+    user: dict = Depends(get_current_user), db: Session = Depends(get_db)
+):
     if user is None:
         raise get_user_exception()
-    return db.query(models.Todos)\
-        .filter(models.Todos.owner_id == user.get("id"))\
-        .all()
+    return db.query(models.Todos).filter(models.Todos.owner_id == user.get("id")).all()
 
 
 @router.get("/{todo_id}")
-async def read_todo(todo_id: int,
-                    user: dict = Depends(get_current_user),
-                    db: Session = Depends(get_db)):
+async def read_todo(
+    todo_id: int, user: dict = Depends(get_current_user), db: Session = Depends(get_db)
+):
     if user is None:
         raise get_user_exception()
-    todo_model = db.query(models.Todos)\
-        .filter(models.Todos.id == todo_id)\
-        .filter(models.Todos.owner_id == user.get("id"))\
+    todo_model = (
+        db.query(models.Todos)
+        .filter(models.Todos.id == todo_id)
+        .filter(models.Todos.owner_id == user.get("id"))
         .first()
+    )
     if todo_model is not None:
         return todo_model
     raise http_exception()
 
 
 @router.post("/")
-async def create_todo(todo: Todo,
-                      user: dict = Depends(get_current_user),
-                      db: Session = Depends(get_db)):
+async def create_todo(
+    todo: Todo, user: dict = Depends(get_current_user), db: Session = Depends(get_db)
+):
     if user is None:
         raise get_user_exception()
     todo_model = models.Todos()
@@ -84,17 +84,21 @@ async def create_todo(todo: Todo,
 
 
 @router.put("/{todo_id}")
-async def update_todo(todo_id: int,
-                      todo: Todo,
-                      user: dict = Depends(get_current_user),
-                      db: Session = Depends(get_db)):
+async def update_todo(
+    todo_id: int,
+    todo: Todo,
+    user: dict = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
     if user is None:
         raise get_user_exception()
 
-    todo_model = db.query(models.Todos)\
-        .filter(models.Todos.id == todo_id)\
-        .filter(models.Todos.owner_id == user.get("id"))\
+    todo_model = (
+        db.query(models.Todos)
+        .filter(models.Todos.id == todo_id)
+        .filter(models.Todos.owner_id == user.get("id"))
         .first()
+    )
 
     if todo_model is None:
         raise http_exception()
@@ -111,23 +115,23 @@ async def update_todo(todo_id: int,
 
 
 @router.delete("/{todo_id}")
-async def delete_todo(todo_id: int,
-                      user: dict = Depends(get_current_user),
-                      db: Session = Depends(get_db)):
+async def delete_todo(
+    todo_id: int, user: dict = Depends(get_current_user), db: Session = Depends(get_db)
+):
     if user is None:
         raise get_user_exception()
 
-    todo_model = db.query(models.Todos)\
-        .filter(models.Todos.id == todo_id)\
-        .filter(models.Todos.owner_id == user.get("id"))\
+    todo_model = (
+        db.query(models.Todos)
+        .filter(models.Todos.id == todo_id)
+        .filter(models.Todos.owner_id == user.get("id"))
         .first()
+    )
 
     if todo_model is None:
         raise http_exception()
 
-    db.query(models.Todos)\
-        .filter(models.Todos.id == todo_id)\
-        .delete()
+    db.query(models.Todos).filter(models.Todos.id == todo_id).delete()
 
     db.commit()
 
@@ -135,27 +139,8 @@ async def delete_todo(todo_id: int,
 
 
 def successful_response(status_code: int):
-    return {
-        'status': status_code,
-        'transaction': 'Successful'
-    }
+    return {"status": status_code, "transaction": "Successful"}
 
 
 def http_exception():
     return HTTPException(status_code=404, detail="Todo not found")
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

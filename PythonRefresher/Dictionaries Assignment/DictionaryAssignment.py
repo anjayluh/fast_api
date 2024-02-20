@@ -14,12 +14,7 @@ my_vehicle = {
 """
 
 
-my_vehicle = {
-    "model": "Ford",
-    "make": "Explorer",
-    "year": 2018,
-    "mileage": 40000
-}
+my_vehicle = {"model": "Ford", "make": "Explorer", "year": 2018, "mileage": 40000}
 
 
 for x, y in my_vehicle.items():
@@ -37,17 +32,3 @@ vehicle2.pop("mileage")
 
 for i in vehicle2:
     print(i)
-
-
-
-
-
-
-
-
-
-
-
-
-
-

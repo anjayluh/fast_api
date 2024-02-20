@@ -1,4 +1,4 @@
-'''
+"""
 - Create a variable (grade) holding an integer between 0 - 100
 
 - Code if, elif, else statements to print the letter grade of the number grade variable
@@ -14,7 +14,7 @@ C = 70-79
 D = 60 - 69
 
 F = 0 - 59
-'''
+"""
 
 
 grade = 27
@@ -28,16 +28,3 @@ elif 60 <= grade < 70:
     print("D")
 else:
     print("F")
-
-
-
-
-
-
-
-
-
-
-
-
-

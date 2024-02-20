@@ -54,6 +54,7 @@ def book_get_by_author_by_category(author: str, category: str):
 
     return result
 
+
 @app.get("/books/{author}/")
 def book_get_by_author(author: str):
     result = []
@@ -79,6 +80,6 @@ async def update_book(updated_book=Body()):
 @app.delete("/books/")
 def delete_book(title: str):
     for i in range(len(BOOKS)):
-        if BOOKS[i].get('title').casefold() == title.casefold():
+        if BOOKS[i].get("title").casefold() == title.casefold():
             BOOKS.pop(i)
             break

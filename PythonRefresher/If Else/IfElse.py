@@ -11,8 +11,3 @@ elif hour < 20:
     print("Good afternoon!")
 else:
     print("Good Night!")
-
-
-
-
-

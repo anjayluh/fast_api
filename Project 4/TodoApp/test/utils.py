@@ -13,12 +13,13 @@ SQLALCHEMY_DATABASE_URL = "sqlite:///./testdb.db"
 engine = create_engine(
     SQLALCHEMY_DATABASE_URL,
     connect_args={"check_same_thread": False},
-    poolclass = StaticPool,
+    poolclass=StaticPool,
 )
 
 TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 Base.metadata.create_all(bind=engine)
+
 
 def override_get_db():
     db = TestingSessionLocal()
@@ -27,10 +28,13 @@ def override_get_db():
     finally:
         db.close()
 
+
 def override_get_current_user():
-    return {'username': 'codingwithrobytest', 'id': 1, 'user_role': 'admin'}
+    return {"username": "codingwithrobytest", "id": 1, "user_role": "admin"}
+
 
 client = TestClient(app)
+
 
 @pytest.fixture
 def test_todo():
@@ -60,7 +64,7 @@ def test_user():
         last_name="Roby",
         hashed_password=bcrypt_context.hash("testpassword"),
         role="admin",
-        phone_number="(111)-111-1111"
+        phone_number="(111)-111-1111",
     )
     db = TestingSessionLocal()
     db.add(user)
@@ -69,9 +73,3 @@ def test_user():
     with engine.connect() as connection:
         connection.execute(text("DELETE FROM users;"))
         connection.commit()
-
-
-
-
-
-

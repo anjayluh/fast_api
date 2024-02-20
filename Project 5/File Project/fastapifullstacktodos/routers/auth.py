@@ -1,4 +1,5 @@
 import sys
+
 sys.path.append("..")
 
 from starlette.responses import RedirectResponse
@@ -31,9 +32,7 @@ oauth2_bearer = OAuth2PasswordBearer(tokenUrl="token")
 
 
 router = APIRouter(
-    prefix="/auth",
-    tags=["auth"],
-    responses={401: {"user": "Not authorized"}}
+    prefix="/auth", tags=["auth"], responses={401: {"user": "Not authorized"}}
 )
 
 
@@ -66,9 +65,7 @@ def verify_password(plain_password, hashed_password):
 
 
 def authenticate_user(username: str, password: str, db):
-    user = db.query(models.Users)\
-        .filter(models.Users.username == username)\
-        .first()
+    user = db.query(models.Users).filter(models.Users.username == username).first()
 
     if not user:
         return False
@@ -77,9 +74,9 @@ def authenticate_user(username: str, password: str, db):
     return user
 
 
-def create_access_token(username: str, user_id: int,
-                        expires_delta: Optional[timedelta] = None):
-
+def create_access_token(
+    username: str, user_id: int, expires_delta: Optional[timedelta] = None
+):
     encode = {"sub": username, "id": user_id}
     if expires_delta:
         expire = datetime.utcnow() + expires_delta
@@ -105,15 +102,16 @@ async def get_current_user(request: Request):
 
 
 @router.post("/token")
-async def login_for_access_token(response: Response, form_data: OAuth2PasswordRequestForm = Depends(),
-                                 db: Session = Depends(get_db)):
+async def login_for_access_token(
+    response: Response,
+    form_data: OAuth2PasswordRequestForm = Depends(),
+    db: Session = Depends(get_db),
+):
     user = authenticate_user(form_data.username, form_data.password, db)
     if not user:
         return False
     token_expires = timedelta(minutes=60)
-    token = create_access_token(user.username,
-                                user.id,
-                                expires_delta=token_expires)
+    token = create_access_token(user.username, user.id, expires_delta=token_expires)
 
     response.set_cookie(key="access_token", value=token, httponly=True)
 
@@ -132,21 +130,29 @@ async def login(request: Request, db: Session = Depends(get_db)):
         await form.create_oauth_form()
         response = RedirectResponse(url="/todos", status_code=status.HTTP_302_FOUND)
 
-        validate_user_cookie = await login_for_access_token(response=response, form_data=form, db=db)
+        validate_user_cookie = await login_for_access_token(
+            response=response, form_data=form, db=db
+        )
 
         if not validate_user_cookie:
             msg = "Incorrect Username or Password"
-            return templates.TemplateResponse("login.html", {"request": request, "msg": msg})
+            return templates.TemplateResponse(
+                "login.html", {"request": request, "msg": msg}
+            )
         return response
     except HTTPException:
         msg = "Unknown Error"
-        return templates.TemplateResponse("login.html", {"request": request, "msg": msg})
+        return templates.TemplateResponse(
+            "login.html", {"request": request, "msg": msg}
+        )
 
 
 @router.get("/logout")
 async def logout(request: Request):
     msg = "Logout Successful"
-    response = templates.TemplateResponse("login.html", {"request": request, "msg": msg})
+    response = templates.TemplateResponse(
+        "login.html", {"request": request, "msg": msg}
+    )
     response.delete_cookie(key="access_token")
     return response
 
@@ -157,18 +163,27 @@ async def register(request: Request):
 
 
 @router.post("/register", response_class=HTMLResponse)
-async def register_user(request: Request, email: str = Form(...), username: str = Form(...),
-                        firstname: str = Form(...), lastname: str = Form(...),
-                        password: str = Form(...), password2: str = Form(...),
-                        db: Session = Depends(get_db)):
-
-    validation1 = db.query(models.Users).filter(models.Users.username == username).first()
+async def register_user(
+    request: Request,
+    email: str = Form(...),
+    username: str = Form(...),
+    firstname: str = Form(...),
+    lastname: str = Form(...),
+    password: str = Form(...),
+    password2: str = Form(...),
+    db: Session = Depends(get_db),
+):
+    validation1 = (
+        db.query(models.Users).filter(models.Users.username == username).first()
+    )
 
     validation2 = db.query(models.Users).filter(models.Users.email == email).first()
 
     if password != password2 or validation1 is not None or validation2 is not None:
         msg = "Invalid registration request"
-        return templates.TemplateResponse("register.html", {"request": request, "msg": msg})
+        return templates.TemplateResponse(
+            "register.html", {"request": request, "msg": msg}
+        )
 
     user_model = models.Users()
     user_model.username = username
